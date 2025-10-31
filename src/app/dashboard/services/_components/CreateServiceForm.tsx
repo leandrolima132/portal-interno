@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { usePortal } from '@/context/PortalContext';
-import { Service } from '@/types';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Service } from '@/types';
 
 interface CreateServiceFormProps {
   isOpen: boolean;
@@ -40,6 +40,7 @@ export function CreateServiceForm({ isOpen, onClose }: CreateServiceFormProps) {
       enabled: formData.enabled,
       lastModified: new Date().toISOString()
     };
+
 
     dispatch({ type: 'ADD_SERVICE', payload: newService });
     

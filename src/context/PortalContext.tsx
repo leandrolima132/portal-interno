@@ -1,14 +1,14 @@
 'use client';
 
-import { Service, Message, AuditLog, DashboardStats, SystemConfig } from '@/types';
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { Service, Message, AuditLog, DashboardStats } from '@/types';
+import { createContext, useContext, useEffect, useReducer, useCallback } from 'react';
+import { toggleStore } from '@/lib/toggleStore';
 
 interface PortalState {
   services: Service[];
   messages: Message[];
   auditLogs: AuditLog[];
   stats: DashboardStats;
-  config: SystemConfig;
   loading: boolean;
   error: string | null;
 }
@@ -20,7 +20,6 @@ type PortalAction =
   | { type: 'SET_MESSAGES'; payload: Message[] }
   | { type: 'SET_AUDIT_LOGS'; payload: AuditLog[] }
   | { type: 'SET_STATS'; payload: DashboardStats }
-  | { type: 'SET_CONFIG'; payload: SystemConfig }
   | { type: 'TOGGLE_SERVICE'; payload: string }
   | { type: 'ADD_SERVICE'; payload: Service }
   | { type: 'DELETE_SERVICE'; payload: string }
@@ -38,13 +37,6 @@ const initialState: PortalState = {
     totalMessages: 0,
     recentChanges: 0,
     systemHealth: 'healthy'
-  },
-  config: {
-    maintenanceMode: false,
-    maintenanceMessage: 'Sistema em manutenção. Tente novamente em alguns minutos.',
-    globalTimeout: 30000,
-    cacheEnabled: true,
-    notificationsEnabled: true
   },
   loading: false,
   error: null
@@ -64,8 +56,6 @@ function portalReducer(state: PortalState, action: PortalAction): PortalState {
       return { ...state, auditLogs: action.payload };
     case 'SET_STATS':
       return { ...state, stats: action.payload };
-    case 'SET_CONFIG':
-      return { ...state, config: action.payload };
     case 'TOGGLE_SERVICE':
       return {
         ...state,
@@ -104,6 +94,45 @@ function portalReducer(state: PortalState, action: PortalAction): PortalState {
   }
 }
 
+/**
+ * Calcula o status de saúde do sistema baseado nos serviços
+ * - Critical: Se algum serviço crítico estiver desativado
+ * - Warning: Se mais de 50% dos serviços estiverem desativados ou serviço de alto impacto desativado
+ * - Healthy: Caso contrário
+ */
+function calculateSystemHealth(services: Service[]): 'healthy' | 'warning' | 'critical' {
+  if (services.length === 0) {
+    return 'healthy';
+  }
+
+  const totalServices = services.length;
+  const inactiveServices = services.filter(s => !s.enabled).length;
+  const inactivePercentage = (inactiveServices / totalServices) * 100;
+
+  // Verificar se algum serviço crítico está desativado
+  const criticalServicesInactive = services.some(
+    service => service.impact === 'critical' && !service.enabled
+  );
+
+  // Verificar se algum serviço de alto impacto está desativado
+  const highImpactServicesInactive = services.some(
+    service => service.impact === 'high' && !service.enabled
+  );
+
+  // Critical: Serviço crítico desativado
+  if (criticalServicesInactive) {
+    return 'critical';
+  }
+
+  // Warning: Mais de 50% dos serviços inativos OU serviço de alto impacto desativado
+  if (inactivePercentage > 50 || highImpactServicesInactive) {
+    return 'warning';
+  }
+
+  // Healthy: Tudo funcionando normalmente
+  return 'healthy';
+}
+
 const PortalContext = createContext<{
   state: PortalState;
   dispatch: React.Dispatch<PortalAction>;
@@ -112,121 +141,105 @@ const PortalContext = createContext<{
 export function PortalProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(portalReducer, initialState);
 
-  // Simular carregamento de dados iniciais
+  // Carregar dados iniciais do JSON ou do storage
   useEffect(() => {
     const loadInitialData = async () => {
       dispatch({ type: 'SET_LOADING', payload: true });
       
       try {
-        // Simular dados mockados
-        const mockServices: Service[] = [
-          {
-            id: 'pix',
-            name: 'Sistema PIX',
-            enabled: true,
-            dependencies: ['auth', 'balance'],
-            impact: 'high',
-            lastModified: '2024-01-15T10:30:00Z',
-            description: 'Sistema de pagamentos instantâneos',
-            category: 'Payments'
-          },
-          {
-            id: 'auth',
-            name: 'Autenticação',
-            enabled: true,
-            dependencies: [],
-            impact: 'critical',
-            lastModified: '2024-01-15T09:15:00Z',
-            description: 'Sistema de autenticação de usuários',
-            category: 'Security'
-          },
-          {
-            id: 'balance',
-            name: 'Consulta de Saldo',
-            enabled: true,
-            dependencies: ['auth'],
-            impact: 'medium',
-            lastModified: '2024-01-15T08:45:00Z',
-            description: 'Consulta de saldo em tempo real',
-            category: 'Account'
-          },
-          {
-            id: 'notifications',
-            name: 'Notificações',
-            enabled: false,
-            dependencies: ['auth'],
-            impact: 'low',
-            lastModified: '2024-01-14T16:20:00Z',
-            description: 'Sistema de notificações push',
-            category: 'Communication'
-          }
-        ];
+        // Tentar carregar do storage primeiro
+        let services = await toggleStore.loadServices();
+        let messages = await toggleStore.loadMessages();
+        let auditLogs = await toggleStore.loadAuditLogs();
 
-        const mockMessages: Message[] = [
-          {
-            code: 'E001',
-            message: 'Erro interno do sistema',
-            type: 'ERROR',
-            platform: 'BOTH',
-            enabled: true,
-            lastModified: '2024-01-15T10:30:00Z',
-            category: 'System'
-          },
-          {
-            code: 'W001',
-            message: 'Serviço temporariamente indisponível',
-            type: 'WARNING',
-            platform: 'BOTH',
-            enabled: true,
-            lastModified: '2024-01-15T09:45:00Z',
-            category: 'Service'
-          },
-          {
-            code: 'I001',
-            message: 'Operação realizada com sucesso',
-            type: 'INFO',
-            platform: 'BOTH',
-            enabled: true,
-            lastModified: '2024-01-15T08:30:00Z',
-            category: 'Success'
-          }
-        ];
+        // Se não houver dados no storage, carregar dos arquivos JSON separados
+        if (services.length === 0) {
+          try {
+            // Carregar arquivos JSON separados
+            const [servicesResponse, messagesResponse, auditLogsResponse] = await Promise.all([
+              fetch('/data/services.json').catch(() => null),
+              fetch('/data/messages.json').catch(() => null),
+              fetch('/data/audit-logs.json').catch(() => null)
+            ]);
 
-        const mockAuditLogs: AuditLog[] = [
-          {
-            id: '1',
-            timestamp: '2024-01-15T10:30:00Z',
-            action: 'service_toggle',
-            user: 'admin',
-            details: 'PIX reativado',
-            serviceId: 'pix'
-          },
-          {
-            id: '2',
-            timestamp: '2024-01-15T09:45:00Z',
-            action: 'message_edit',
-            user: 'admin',
-            details: 'Mensagem E001 atualizada',
-            messageCode: 'E001'
-          }
-        ];
+            // Carregar serviços
+            if (servicesResponse?.ok) {
+              const servicesData = await servicesResponse.json();
+              if (servicesData && servicesData.length > 0) {
+                await toggleStore.loadServicesFromJSON(servicesData);
+                services = servicesData;
+              }
+            }
 
-        dispatch({ type: 'SET_SERVICES', payload: mockServices });
-        dispatch({ type: 'SET_MESSAGES', payload: mockMessages });
-        dispatch({ type: 'SET_AUDIT_LOGS', payload: mockAuditLogs });
+            // Carregar mensagens
+            if (messagesResponse?.ok) {
+              const messagesData = await messagesResponse.json();
+              if (messagesData && messagesData.length > 0) {
+                await toggleStore.saveMessages(messagesData);
+                messages = messagesData;
+              }
+            }
+
+            // Carregar logs de auditoria
+            if (auditLogsResponse?.ok) {
+              const auditLogsData = await auditLogsResponse.json();
+              if (auditLogsData && auditLogsData.length > 0) {
+                const now = new Date();
+                const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                
+                // Filtrar apenas logs dos últimos 30 dias
+                const validLogs = auditLogsData.filter((log: AuditLog) => {
+                  const logDate = new Date(log.timestamp);
+                  return logDate >= thirtyDaysAgo;
+                });
+                
+                // Se foram filtrados logs antigos, salvar o JSON limpo no servidor
+                if (validLogs.length !== auditLogsData.length) {
+                  try {
+                    await fetch('/api/toggles', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        auditLogs: validLogs
+                      }),
+                    });
+                  } catch (error) {
+                    console.warn('Erro ao limpar logs antigos do JSON:', error);
+                  }
+                }
+                
+                // Adicionar logs válidos
+                for (const log of validLogs) {
+                  await toggleStore.addAuditLog(log);
+                }
+                
+                auditLogs = validLogs;
+              }
+            }
+          } catch (jsonError) {
+            console.warn('Erro ao carregar JSONs, usando dados padrão:', jsonError);
+          }
+        }
+
+        dispatch({ type: 'SET_SERVICES', payload: services });
+        dispatch({ type: 'SET_MESSAGES', payload: messages });
+        dispatch({ type: 'SET_AUDIT_LOGS', payload: auditLogs });
         
         // Calcular estatísticas
         const stats: DashboardStats = {
-          totalServices: mockServices.length,
-          activeServices: mockServices.filter(s => s.enabled).length,
-          inactiveServices: mockServices.filter(s => !s.enabled).length,
-          totalMessages: mockMessages.length,
-          recentChanges: mockAuditLogs.length,
-          systemHealth: 'healthy'
+          totalServices: services.length,
+          activeServices: services.filter(s => s.enabled).length,
+          inactiveServices: services.filter(s => !s.enabled).length,
+          totalMessages: messages.length,
+          recentChanges: auditLogs.length,
+          systemHealth: calculateSystemHealth(services)
         };
         
         dispatch({ type: 'SET_STATS', payload: stats });
       } catch (error) {
+        console.error('Erro ao carregar dados:', error);
         dispatch({ type: 'SET_ERROR', payload: 'Erro ao carregar dados' });
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false });
@@ -236,8 +249,63 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
     loadInitialData();
   }, []);
 
+  // Atualizar estatísticas quando os serviços mudarem
+  useEffect(() => {
+    if (state.loading) return;
+
+    const stats: DashboardStats = {
+      totalServices: state.services.length,
+      activeServices: state.services.filter(s => s.enabled).length,
+      inactiveServices: state.services.filter(s => !s.enabled).length,
+      totalMessages: state.messages.length,
+      recentChanges: state.auditLogs.length,
+      systemHealth: calculateSystemHealth(state.services)
+    };
+    
+    dispatch({ type: 'SET_STATS', payload: stats });
+  }, [state.services, state.messages, state.loading]);
+
+  // Interceptar ações para persistir no toggleStore
+  const enhancedDispatch = useCallback((action: PortalAction) => {
+    dispatch(action);
+    
+    // Persistir mudanças assíncronamente após a ação
+    (async () => {
+      switch (action.type) {
+        case 'TOGGLE_SERVICE':
+          try {
+            await toggleStore.toggleService(action.payload);
+          } catch (error) {
+            console.error('Erro ao persistir toggle:', error);
+          }
+          break;
+        case 'ADD_SERVICE':
+          try {
+            await toggleStore.addService(action.payload);
+          } catch (error) {
+            console.error('Erro ao persistir novo serviço:', error);
+          }
+          break;
+        case 'DELETE_SERVICE':
+          try {
+            await toggleStore.deleteService(action.payload);
+          } catch (error) {
+            console.error('Erro ao persistir exclusão:', error);
+          }
+          break;
+        case 'ADD_AUDIT_LOG':
+          try {
+            await toggleStore.addAuditLog(action.payload);
+          } catch (error) {
+            console.error('Erro ao persistir log de auditoria:', error);
+          }
+          break;
+      }
+    })();
+  }, []);
+
   return (
-    <PortalContext.Provider value={{ state, dispatch }}>
+    <PortalContext.Provider value={{ state, dispatch: enhancedDispatch }}>
       {children}
     </PortalContext.Provider>
   );

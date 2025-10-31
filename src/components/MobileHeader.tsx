@@ -84,9 +84,9 @@ export function MobileHeader() {
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center gap-2">
               <div className="bg-[#202AD0] p-2 rounded-lg">
-                <Image src="/logo-dm-white.png" alt="Logo" width={40} height={100} />
+                {/* <Image src="/logo.png" alt="Logo" width={40} height={100} /> */}
+                <span className="text-white">sua logo aqui</span>
               </div>
-              <span className="font-bold text-gray-900">DM Conta</span>
             </div>
             <button
               onClick={() => setIsMenuOpen(false)}

@@ -69,8 +69,9 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         {/* HEADER */}
         <SidebarHeader className="p-4 ">
 
-          <div className="flex items-center justify-start">
-              <Image src="/logo-dm-white.png" alt="Logo" width={50} height={100} />
+          <div className="flex items-center justify-center">
+              {/* <Image src="/logo.png" alt="Logo" width={50} height={100} /> */}
+              <span className="text-white">sua logo aqui</span>
           </div>
         </SidebarHeader>
 
