@@ -1,34 +1,41 @@
-# Portal de Gestão DM Card
+# Portal de Gestão de toggles
 
 Portal web centralizado para gestão de serviços e mensagens em tempo real, desenvolvido para substituir o sistema de arquivos JSON e proporcionar agilidade operacional.
 
 ## 🎯 Funcionalidades
 
-### Dashboard
-- Visão geral do sistema com métricas em tempo real
-- Status dos serviços (ativo/inativo)
-- Indicadores de saúde do sistema
-- Atividade recente
+### Dashboard ✅
+- ✅ Visão geral do sistema com métricas em tempo real
+- ✅ Status dos serviços (ativo/inativo)
+- ✅ Indicadores de saúde do sistema (reativo - healthy/warning/critical)
+- ✅ Atividade recente
 
 ### Gestão de Serviços
-- Toggle visual para ativar/desativar serviços
-- Controle de dependências entre serviços
-- Classificação por impacto (crítico, alto, médio, baixo)
-- Ações em lote (ativar/desativar todos)
-- Modo de manutenção
+- ✅ Toggle visual para ativar/desativar serviços
+- ⚠️ Controle de dependências entre serviços (campo existe, falta validação)
+- ✅ Classificação por impacto (crítico, alto, médio, baixo)
+- ✅ Criação e exclusão de serviços
+- ✅ Busca e filtros avançados
+- ❌ Ações em lote (ativar/desativar todos) - Pendente
+- ❌ Modo de manutenção - Pendente
 
 ### Editor de Mensagens
-- Edição em tempo real das mensagens do sistema
-- Preview antes de publicar
-- Categorização por tipo (ERROR, WARNING, INFO, SUCCESS)
-- Controle por plataforma (WEB, MOBILE, BOTH)
-- Versionamento automático
+- ✅ Edição em tempo real das mensagens do sistema
+- ✅ Preview antes de publicar
+- ✅ Categorização por tipo (ERROR, WARNING, INFO, SUCCESS)
+- ✅ Controle por plataforma (WEB, MOBILE, BOTH)
+- ✅ Busca de mensagens
+- ❌ Criar nova mensagem - Pendente
+- ⚠️ Versionamento automático (apenas lastModified) - Parcial
 
 ### Sistema de Auditoria
-- Log completo de todas as mudanças
-- Filtros por tipo de ação e data
-- Rastreamento de usuário e timestamp
-- Exportação de relatórios (CSV/JSON)
+- ✅ Log completo de todas as mudanças
+- ✅ Filtros por tipo de ação e data
+- ✅ Rastreamento de usuário e timestamp
+- ✅ Visualização detalhada dos logs
+- ❌ Exportação de relatórios (CSV/JSON) - Pendente
+
+> 📋 **Nota**: Para ver a lista completa de funcionalidades pendentes, veja a seção [Roadmap e Funcionalidades Pendentes](#-roadmap-e-funcionalidades-pendentes) abaixo.
 
 ## 🏗️ Arquitetura
 
@@ -67,19 +74,19 @@ interface Message {
 
 ### Pré-requisitos
 - Node.js 18+
-- npm ou yarn
+- pnpm (recomendado) ou npm
 
 ### Instalação
 ```bash
 # Instalar dependências
-npm install
+pnpm install
 
 # Executar em modo desenvolvimento
-npm run dev
+pnpm dev
 
 # Build para produção
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ### Acesso
@@ -156,41 +163,90 @@ O portal está preparado para integração com APIs REST para:
 
 ### Desenvolvimento
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ### Produção
 ```bash
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ### Docker
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
+RUN corepack enable && corepack prepare pnpm@latest --activate
+COPY pnpm-lock.yaml package.json ./
+RUN pnpm install --frozen-lockfile --prod
 COPY . .
-RUN npm run build
+RUN pnpm build
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
 ```
 
-## 📈 Roadmap
+## 📈 Roadmap e Funcionalidades Pendentes
 
-### Próximas Funcionalidades
+### 🚨 **Alta Prioridade**
+
+#### 1. Validação de Dependências entre Serviços
+- Validar se ao desativar um serviço, seus dependentes devem ser alertados/desativados
+- Prevenir ativação de serviço se suas dependências estiverem desativadas
+- Mostrar alerta visual quando dependências não estão ativas
+
+#### 2. Exportação de Relatórios (CSV/JSON)
+- Botões de exportação existem mas não funcionam
+- Implementar função `exportToCSV()` e `exportToJSON()`
+- Download dos arquivos exportados
+
+#### 3. Criar Nova Mensagem
+- Modal/formulário para criar nova mensagem
+- Validação de código único
+- Ação `ADD_MESSAGE` no reducer
+
+### ⚠️ **Média Prioridade**
+
+#### 4. Ações em Lote (Ativar/Desativar Todos)
+- Botão "Ativar Todos" na página de serviços
+- Botão "Desativar Todos" na página de serviços
+- Modal de confirmação para ações em lote
+
+#### 5. Modo de Manutenção Global
+- Toggle global de modo de manutenção
+- Mensagem personalizada de manutenção
+- Bloqueio/avisos quando sistema está em manutenção
+
+#### 6. Versionamento Automático de Mensagens
+- Histórico de versões de cada mensagem
+- Visualização de versões anteriores
+- Rollback para versão anterior
+
+### 💡 **Baixa Prioridade / Features Avançadas**
+
+#### 7. Autenticação de Usuários
+- Sistema de login
+- Gerenciamento de sessão
+- Proteção de rotas
+
+#### 8. Controle de Permissões por Módulo
+- Sistema de roles/permissões
+- Controle de acesso por módulo (Serviços, Mensagens, Auditoria)
+
+#### 9. Backup Automático
+- Agendamento de backups
+- Download de backup
+- Restauração de backup
+
+### 📋 **Próximas Funcionalidades (Roadmap)**
 - [ ] Integração com APIs reais
 - [ ] Notificações em tempo real
 - [ ] Gráficos de performance
-- [ ] Backup automático
 - [ ] Modo offline
 - [ ] Mobile app
 
-### Melhorias Planejadas
+### 🔧 **Melhorias Planejadas**
 - [ ] Cache inteligente
 - [ ] Analytics de uso
-- [ ] Versionamento granular
 - [ ] Rollback automático
 - [ ] Testes automatizados
 
