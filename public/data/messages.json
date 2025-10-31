@@ -1,0 +1,29 @@
+[
+  {
+    "code": "E001",
+    "message": "Erro interno do sistema",
+    "type": "ERROR",
+    "platform": "BOTH",
+    "enabled": true,
+    "lastModified": "2024-01-15T10:30:00Z",
+    "category": "System"
+  },
+  {
+    "code": "W001",
+    "message": "Serviço temporariamente indisponível",
+    "type": "WARNING",
+    "platform": "BOTH",
+    "enabled": true,
+    "lastModified": "2024-01-15T09:45:00Z",
+    "category": "Service"
+  },
+  {
+    "code": "I001",
+    "message": "Operação realizada com sucesso",
+    "type": "INFO",
+    "platform": "BOTH",
+    "enabled": true,
+    "lastModified": "2024-01-15T08:30:00Z",
+    "category": "Success"
+  }
+]

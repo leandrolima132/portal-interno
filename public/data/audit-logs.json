@@ -1,0 +1,130 @@
+[
+  {
+    "id": "1761872778466",
+    "timestamp": "2025-10-31T01:06:18.466Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Notificações desativado",
+    "serviceId": "notifications"
+  },
+  {
+    "id": "1761872775826",
+    "timestamp": "2025-10-31T01:06:15.826Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Sistema PIX ativado",
+    "serviceId": "pix"
+  },
+  {
+    "id": "1761872751194",
+    "timestamp": "2025-10-31T01:05:51.194Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Sistema PIX desativado",
+    "serviceId": "pix"
+  },
+  {
+    "id": "1761872744874",
+    "timestamp": "2025-10-31T01:05:44.874Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "teste ativado",
+    "serviceId": "teste"
+  },
+  {
+    "id": "1761872744050",
+    "timestamp": "2025-10-31T01:05:44.050Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Cartões ativado",
+    "serviceId": "cards"
+  },
+  {
+    "id": "1761872741874",
+    "timestamp": "2025-10-31T01:05:41.874Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Transferências ativado",
+    "serviceId": "transfers"
+  },
+  {
+    "id": "1761872733994",
+    "timestamp": "2025-10-31T01:05:33.994Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Notificações ativado",
+    "serviceId": "notifications"
+  },
+  {
+    "id": "1761872728753",
+    "timestamp": "2025-10-31T01:05:28.753Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Consulta de Saldo ativado",
+    "serviceId": "balance"
+  },
+  {
+    "id": "1761872723386",
+    "timestamp": "2025-10-31T01:05:23.386Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Autenticação ativado",
+    "serviceId": "auth"
+  },
+  {
+    "id": "1761872722066",
+    "timestamp": "2025-10-31T01:05:22.066Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Sistema PIX ativado",
+    "serviceId": "pix"
+  },
+  {
+    "id": "1761872608127",
+    "timestamp": "2025-10-31T01:03:28.127Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Cartões desativado",
+    "serviceId": "cards"
+  },
+  {
+    "id": "1761872606127",
+    "timestamp": "2025-10-31T01:03:26.127Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Transferências desativado",
+    "serviceId": "transfers"
+  },
+  {
+    "id": "1761872602638",
+    "timestamp": "2025-10-31T01:03:22.638Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Autenticação desativado",
+    "serviceId": "auth"
+  },
+  {
+    "id": "1761872600952",
+    "timestamp": "2025-10-31T01:03:20.952Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Consulta de Saldo desativado",
+    "serviceId": "balance"
+  },
+  {
+    "id": "1761867281147",
+    "timestamp": "2025-10-30T23:34:41.147Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "teste desativado",
+    "serviceId": "teste"
+  },
+  {
+    "id": "1761867897515",
+    "timestamp": "2025-10-30T23:44:57.515Z",
+    "action": "service_toggle",
+    "user": "admin",
+    "details": "Sistema PIX desativado",
+    "serviceId": "pix"
+  }
+]

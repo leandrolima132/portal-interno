@@ -1,0 +1,84 @@
+[
+  {
+    "id": "pix",
+    "name": "Sistema PIX",
+    "enabled": true,
+    "dependencies": [
+      "auth",
+      "balance"
+    ],
+    "impact": "high",
+    "lastModified": "2025-10-31T01:06:15.847Z",
+    "description": "Sistema de pagamentos instantâneos",
+    "category": "Payments"
+  },
+  {
+    "id": "auth",
+    "name": "Autenticação",
+    "enabled": true,
+    "dependencies": [],
+    "impact": "critical",
+    "lastModified": "2025-10-31T01:05:23.401Z",
+    "description": "Sistema de autenticação de usuários",
+    "category": "Security"
+  },
+  {
+    "id": "balance",
+    "name": "Consulta de Saldo",
+    "enabled": true,
+    "dependencies": [
+      "auth"
+    ],
+    "impact": "medium",
+    "lastModified": "2025-10-31T01:05:28.766Z",
+    "description": "Consulta de saldo em tempo real",
+    "category": "Account"
+  },
+  {
+    "id": "notifications",
+    "name": "Notificações",
+    "enabled": false,
+    "dependencies": [
+      "auth"
+    ],
+    "impact": "low",
+    "lastModified": "2025-10-31T01:06:18.487Z",
+    "description": "Sistema de notificações push",
+    "category": "Communication"
+  },
+  {
+    "id": "transfers",
+    "name": "Transferências",
+    "enabled": true,
+    "dependencies": [
+      "auth",
+      "balance"
+    ],
+    "impact": "high",
+    "lastModified": "2025-10-31T01:05:41.886Z",
+    "description": "Sistema de transferências bancárias",
+    "category": "Payments"
+  },
+  {
+    "id": "cards",
+    "name": "Cartões",
+    "enabled": true,
+    "dependencies": [
+      "auth"
+    ],
+    "impact": "medium",
+    "lastModified": "2025-10-31T01:05:44.062Z",
+    "description": "Gestão de cartões de crédito e débito",
+    "category": "Payments"
+  },
+  {
+    "id": "teste",
+    "name": "teste",
+    "description": "asdas",
+    "category": "Payments",
+    "impact": "medium",
+    "dependencies": [],
+    "enabled": true,
+    "lastModified": "2025-10-31T01:05:44.897Z"
+  }
+]
